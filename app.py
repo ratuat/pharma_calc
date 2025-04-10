@@ -55,6 +55,11 @@ qaly_standard = st.sidebar.number_input("QALY of standard treatment", min_value=
 new_lesions = st.sidebar.number_input("Number of new lesions", min_value=0, value=0)
 edss_progression = st.sidebar.selectbox("Has EDSS progression occurred?", ["No", "Yes"]) == "Yes"
 
+st.sidebar.header("EDSS Progression Input")
+edss_input = st.sidebar.text_input("Enter EDSS scores separated by commas", value="2.0,2.5,3.0,3.2,3.4")
+edss_values = [float(val.strip()) for val in edss_input.split(',') if val.strip() != ""]
+edss_scores = {i * 24: score for i, score in enumerate(edss_values)}
+
 # Calculations
 arr = calculate_arr(relapses, patients, years)
 icer = calculate_icer(cost_new, cost_standard, qaly_new, qaly_standard)
@@ -71,7 +76,9 @@ st.subheader("ARR Comparison")
 arr_data = {'Standard': calculate_arr(20, 100, 2), 'New': arr}
 st.pyplot(plot_arr_comparison(arr_data))
 
-# EDSS Progression Plot
-st.subheader("EDSS Progression (Example)")
-edss_scores = {0: 2.0, 24: 2.5, 48: 3.0, 72: 3.2, 96: 3.4}
-st.pyplot(plot_edss_progression(edss_scores))
+# EDSS Progression Graph
+if len(edss_scores) > 1:
+    st.subheader("EDSS Progression Graph")
+    st.pyplot(plot_edss_progression(edss_scores))
+else:
+    st.info("Please enter at least two EDSS values separated by commas.")
